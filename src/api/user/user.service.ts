@@ -40,7 +40,7 @@ export class UserService {
     return `This action removes a #${id} user`;
   }
 
-  async register(info: { username: string; password: string }) {
+  async registerUser(info: { username: string; password: string }) {
     const { username, password } = info;
     const user = await this.userRepository.findOne({where:{username}})
     if(!user) {
@@ -49,12 +49,16 @@ export class UserService {
       await this.userRepository.createQueryBuilder().insert().into(UserEntity).values([
         {
           username,
-          password,
-          salt: pwd,
+          password: pwd,
           createdAt: Date.now() / 1000,
           updatedAt: Date.now() / 1000
         }
-      ])
+      ]).execute()
+
+      return {
+        code: 0,
+        message: 'ok'
+      }
 
     }
     return {
