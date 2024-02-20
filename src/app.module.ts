@@ -1,11 +1,12 @@
-import { Module } from '@nestjs/common';
+import { Module,MiddlewareConsumer,NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { ApiModule } from './api/api.module';
 import { PluginModule } from './plugin/plugin.module';
 import {JwtModule} from '@nestjs/jwt'
+
+import { TestMiddleware } from './test.middleware';
 
 @Module({
   imports: [
@@ -26,10 +27,13 @@ import {JwtModule} from '@nestjs/jwt'
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
-    ApiModule,
     PluginModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule{
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(TestMiddleware).forRoutes('*')
+  }
+}
